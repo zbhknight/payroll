@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+	<h2>{{ check.checkDate }}{{ check.periodType}}签到</h2>
+</div>
+<div>
+	{% for uc in ucList %}
+	{{ uc.FK_user.name }}          {{ uc.timePeriod }}h<br/>
+	{% endfor %}
+	{% for l in lList %}
+	{{ l.FK_user.name }} (请假 {{ l.sub|default:"无" }}代班)<br/>
+	{% endfor %}
+	{% for a in aList %}
+	{{ a.FK_user.name }} (缺勤)<br/>
+	{% endfor %}
+</div>
+<br/>
+<hr/>
+<div>
+	{% for t in tList %}
+	<div>
+		Ticket {{t.ticketNum }}:<br/>
+		故障原因:{{ t.reason }}<br/>
+		处理方法:{{ t.way }}<br/>
+		处理人:
+		{% for dealer in t.namelist %}{{ dealer }} {% endfor %}
+	</div><br/>
+	{% endfor %}
+</div>
+{% if user.role == "black" %}
+<div>
+	<form method="POST" action="/wm/del/">{% csrf_token %}
+		<input type="hidden" id="id_cid" name="cid" value="{{ check.id }}">
+		<input type="submit" value="删除该签到">
+</div>
+{% endif %}
+{% endblock %}

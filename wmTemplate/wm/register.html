@@ -1,0 +1,6 @@
+<h1>注册</h1>
+<div>{{ error }}</div>
+<form action="/wm/register/" method="post">{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="同步" />
+</form>

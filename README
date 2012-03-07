@@ -1,0 +1,2 @@
+这是一个根据个人需要用django编写的考勤和工资统计系统。
+所有django代码文件放在wm文件夹，wmTemplate存放模版文件，css和js文件存放在static文件夹

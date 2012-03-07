@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block morehead %}
+		<link href="/static/wm/datepicker.css" type="text/css" rel="stylesheet">
+		<script type="text/javascript" src="/static/wm/jquery-ui.min.js"></script>
+		<script type="text/javascript">
+			$(document).ajaxSend(function(event, xhr, settings) {
+				function getCookie(name) {
+					var cookieValue = null;
+					if (document.cookie && document.cookie != '') {
+						var cookies = document.cookie.split(';');
+						for (var i = 0; i < cookies.length; i++) {
+							var cookie = jQuery.trim(cookies[i]);
+							// Does this cookie string begin with the name we want?
+							if (cookie.substring(0, name.length + 1) == (name + '=')) {
+								cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+								break;
+							}
+						}
+					}
+					return cookieValue;
+				}
+
+				function sameOrigin(url) {
+					// url could be relative or scheme relative or absolute
+					var host = document.location.host; // host + port
+					var protocol = document.location.protocol;
+					var sr_origin = '//' + host;
+					var origin = protocol + sr_origin;
+					// Allow absolute or scheme relative URLs to same origin
+					return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+						(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+						// or any other URL that isn't scheme relative or absolute i.e relative.
+						!(/^(\/\/|http:|https:).*/.test(url));
+				}
+
+				function safeMethod(method) {
+						return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+				}
+
+				if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+					xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+				}
+			});
+
+			function adducForm(){
+				i = $(".ucForm").length
+				var formHtml = '<br/><div class="ucForm"><label for="id_name-'+i+'">姓名:</label><input id="id_name-'+i+'" type="text" name="name-'+i+'" maxlengtd="20" /><label for="id_status-'+i+'">状态:</label><select name="status-'+i+'" id="id_status-'+i+'"><option value="0">正常</option><option value="1">请假</option><option value="2">缺勤</option></select><label for="id_periodTime-'+i+'">值班时间:</label><input type="text" name="periodTime-'+i+'" id="id_periodTime-'+i+'" /><label class="tohide" for="id_subname-'+i+'" style="display:none;">代班:</label><input type="text" class="tohide" name="subname-'+i+'" id="id_subname-'+i+'" style="display:none;" /><input type="hidden" name="cDate-'+i+'" id="id_cDate-'+i+'" /><input type="hidden" name="ptype-'+i+'" id="id_ptype-'+i+'" /></div>'
+				$("#uCheckBlock").append(formHtml)
+				//$(".tohide").hide()
+			}
+			
+			function addTicket(){
+				i = $(".ticket").length
+				var formHtml = '<br/><div class="ticket"><label for="id_ticketNum-'+i+'">Ticket单号:</label><input id="id_ticketNum-'+i+'" type="text" name="ticketNum-'+i+'" maxlength="7" /><label for="id_reason-'+i+'">故障原因:</label><input id="id_reason-'+i+'" type="text" name="reason-'+i+'" maxlength="300" /><label for="id_way-'+i+'">处理方法:</label><input id="id_way-'+i+'" type="text" name="way-'+i+'" maxlength="300" /><input type="hidden" name="checkNum-'+i+'" id="id_checkNum-'+i+'" /><tr id="dealerRow-'+i+'"><label>处理人:</label><input id="dealer-0" type="text" name="dealername-'+i+'" maxlengtd="20" /></div>'
+				$("#ticketBlock").append(formHtml)
+			}
+
+			function getTime(wday, ptype){
+				var timeArray = new Array('3', '2', '2', '2', '3','2.5');
+				if(wday < 6){
+					return timeArray[ptype];
+				}
+				else if(ptype == 0){
+					return timeArray[1];
+				}
+				else if(ptype == 2)
+					return timeArray[5]
+				else 
+					return timeArray[ptype];
+			}
+
+			function getNameList(){
+				var dateValue = $("#id_checkDate")[0].value
+				var ptypeValue = $("#id_ptype")[0].value
+				$.post("/wm/a_namelist/", {date:dateValue,ptype:ptypeValue}, function(json){
+						if(json['success'] == "True"){
+							$("#id_checkDate").attr("disabled","disabled")
+							$("#id_ptype").attr("disabled","disabled")
+							$("#dateOk").attr("disabled","disabled")
+							var userNum = json['num']
+							for(var i = 0; i < userNum; i++){
+								adducForm()
+								var tmp = "#id_name-" + i;
+								$(tmp).val(json[i]);
+								tmp = "#id_periodTime-" + i;
+								$(tmp).val(getTime(json['wday'],ptypeValue));
+								tmp = "#id_cDate-" + i;
+								$(tmp).val(dateValue);
+								tmp = "#id_ptype-" + i;
+								$(tmp).val(ptypeValue);
+							}
+						} else {
+							alert(json['status'])
+						}
+						})
+			}
+
+			function submitAll(){
+				$("#id_userNum").val($(".ucForm").length)
+				$("#id_ticketNum").val($(".ticket").length)
+				var allData = $("form").serialize();
+				//$("#ticketBlock").append($("form").serialize());
+				$.post("/wm/a_getcheck/", allData, function(json){
+						if(json['status'] == "OK"){
+							alert("成功提交")
+							location.href = "/wm/index/"
+						}
+						else
+							alert(json['status']);
+						})
+			}
+
+			function checkSub(select){
+				if($(select).val() == '1') 
+					$(select).parent().find('.tohide').show();
+				else
+					$(select).parent().find('.tohide').hide()
+			}
+
+			function addClickHandlers(){
+				$('select').live('change', function() {checkSub(this)})
+				$("#id_checkDate").removeAttr("disabled")
+				$("#id_ptype").removeAttr("disabled")
+				$("#dateOk").removeAttr("disabled")
+				$("#id_userNum").val(0)
+				$("#id_ticketNum").val(0)
+				$("#dateOk").click( function() {getNameList()});
+				$("#id_checkDate").click().datepicker()
+				$("#adducForm").click( function() {adducForm()})
+				$("#addTicket").click( function() {addTicket()})
+				$("#submitAll").click( function() {submitAll()})
+			}
+			$(document).ready(addClickHandlers);
+		</script>
+{% endblock %}
+{% block content %}
+		<div id="cDateBlock">
+			<div id="datepicker">
+				{{ checkForm.as_table }}
+				<input type="button" id="dateOk" value="选择班次">
+			</div>
+			<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+			<hr/>
+		</div>
+		<form>
+			<div>
+				<input type="hidden" id="id_userNum" name="userNum">
+			</div>
+			<div id="uCheckBlock">
+				<input type="button" value="添加值班同学" id="adducForm"/>
+				<br/>
+			</div>
+			<div>
+				<input type="hidden" id="id_ticketNum" name="ticketNum">
+			</div>
+			<div id="ticketBlock">
+				<br/><hr/>
+				<input type="button" value="添加ticket" id="addTicket"/>
+				<br/>
+			</div>
+		</form>
+		<div>
+			<input type="button" value="提交 " id="submitAll">
+		</div>
+{% endblock %}

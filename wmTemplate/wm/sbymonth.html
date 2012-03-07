@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+	<table>
+		<thead align="center">
+			<tr>
+				<th>学号</th>
+				<th>姓名</th>
+				<th>月份</th>
+				<th>开始日期</th>
+				<th>结束日期</th>
+				<th>前台值班</th>
+				<th>晚班</th>
+				<th>Ticket</th>
+				<th>加班</th>
+				<th>全勤</th>
+				<th>负责人</th>
+				<th>请假次数</th>
+				<th>缺勤次数</th>
+				<th>总工时</th>
+			</tr>
+		</thead>
+		<tbody align="center">
+			{% for s in sList %}
+			<tr>
+				<td>{{ s.FK_user.stuNum }}</td>
+				<td>{{ s.FK_user.name }}</td> 
+				<td>{{ s.year }}年{{ s.month }}月
+				<td>{{ s.startDate }}</td> 
+				<td>{{ s.endDate }}</td> 
+				<td>{{ s.dayTime }}</td> 
+				<td>{{ s.nightTime }}</td> 
+				<td>{{ s.ticket }}</td> 
+				<td>{{ s.ot }}</td> 
+				<td>{{ s.fullWork }}</td> 
+				<td>{{ s.charger }}</td>
+				<td>{{ s.leave }}</td>
+				<td>{{ s.absence }}</td>
+				<td>{{ s.total }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% if role == 'black' %}
+	<form method="post" action="/wm/delsalary/">{% csrf_token %}
+		<input type="hidden" id="id_year" name="year" value="{{ year }}">
+		<input type="hidden" id="id_month" name="month" value="{{ month }}">
+		<input type="submit" value="删除">
+	</form>
+	{% endif %}
+	<form method="post" action="/wm/download/">{% csrf_token %}
+		<input type="hidden" id="id_year" name="year" value="{{ year }}">
+		<input type="hidden" id="id_month" name="month" value="{{ month }}">
+		<input type="submit" value="下载">
+	</form>
+{% endblock %}

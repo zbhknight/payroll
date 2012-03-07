@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>最新签到</h2>
+{% if error %}
+{{ error }}
+{% else %}
+<div>
+	{% for item in items %}
+	<p><a href="/wm/detail/{{ item.id }}/">{{ item.checkDate }}{{ item.periodType }}签到............................................by{{ item.handler.name }}</a></p>
+	{% endfor %}
+</div>
+<div>
+	第{{ now }}页
+	{% for i in numList %}
+	<a href="/wm/viewcheck/{{ i }}/"> {{ i }} </a>
+	{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

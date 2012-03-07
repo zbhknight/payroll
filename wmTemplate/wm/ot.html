@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block morehead %}
+		<script type="text/javascript">
+			function addItem(){
+				var i = $(".nameline").length
+				var itemHtml = '<p><label>名单:</label><input class="nameline" type="text" id="id_namelist-'+i+'" name="namelist-'+i+'" maxlength="300" size="60"></input><label>加班时长:</label><input id="id_hours-'+i+'" type="text" name="hours-'+i+'"></p>'
+				$('#mydiv').append(itemHtml)
+				$('#id_lineNum').val($(".nameline").length)
+			}
+
+			function addClickHandler(){
+				$('#addNameLine').click(function() { addItem() })
+			}
+
+			$(document).ready(addClickHandler);
+		</script>
+{% endblock %}
+{% block content %}
+		<div>
+			<form action="/wm/ot/" method="POST">{% csrf_token %}
+				<input type="hidden" id="id_lineNum" name="lineNum" value="0">
+				<div id="mydiv">
+					<p><label>加班事由:</label><input type="text" id="id_detail" name="detail" maxlength="300"><label for="id_otTime">加班时间:</label> <input type="text" name="otTime" id="id_otTime" /><label>时间示例：2012-03-04 14:00:00 </label><input type="button" id="addNameLine" value="添加名单"></p>
+				</div>
+				<input type="submit" value="提交">
+			</form>
+		</div>
+{% endblock %}

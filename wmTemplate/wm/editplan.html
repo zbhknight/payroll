@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block morehead %}
+<script type="text/javascript">
+	var count = {{ count }}
+	function myFunc() {
+		var text = '<tr><th><label for="id_form-' + count +'-name">姓名:</label></th><td><input id="id_form-' + count +'-name" type="text" name="form-' + count + '-name" maxlength="20" /></td></tr>'
+		count = count + 1
+		var tt = document.getElementsByTagName('tbody')
+		//tt[0].appendChild(text)
+		tt[0].insertAdjacentHTML("beforeEnd",text)
+		var target = document.getElementsByName('form-TOTAL_FORMS')
+		target[0].value = count
+	}
+</script>
+{% endblock %}
+{% block content %}
+<h1>修改班表</h1>
+<p><h3>{{ dayType }}</h3></p>
+<form id="xx" action="/wm/plan/{{ one }}/{{ two }}/" method="post">{% csrf_token %}
+	{{ formset.management_form }}
+	<table name="tt">
+		{% for form in formset.forms %}
+		{{ form }}
+		{% endfor %}
+	</table>
+	<input type="submit" value="提交" />
+</form>
+<input type="button" value="添加人数" onclick="myFunc()">
+{% endblock %}

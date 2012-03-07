@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block morehead %}
+<script type="text/javascript">
+{% if new == "new" %}
+	alert("{{ back }}")
+	location.href="/wm/login/"
+{% endif %}
+</script>
+{% endblock %}
+{% block content %}
+<div>
+	{% for b in back %}
+	<p>{{ b }}</p>
+	{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block morehead %}
+		<link href="/static/wm/datepicker.css" type="text/css" rel="stylesheet">
+		<script type="text/javascript" src="/static/wm/jquery-ui.min.js"></script>
+		<script type="text/javascript">
+			function addClickHandler(){
+				$("#id_startDate").click().datepicker()
+				$("#id_endDate").click().datepicker()
+			}
+			$(document).ready(addClickHandler)
+		</script>
+{% endblock %}
+{% block content %}
+		<form action="/wm/getsalary/{{ mode }}/" method="POST">{% csrf_token %}
+			{{ form.as_table }}
+			<input type="submit" value="提交">
+		</form>
+{% endblock %}

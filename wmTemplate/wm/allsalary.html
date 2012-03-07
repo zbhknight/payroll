@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+	<div>
+		{% for p in pList %}
+		<p><a href="/wm/sbymonth/{{ p.year }}/{{ p.month }}/">{{ p.year }}年{{ p.month }}月工资记录</a></p>
+		{% endfor %}
+	</div>
+	<div>
+		第{{ now }}页 
+		{% for n in pageNum %}{{ n }} {% endfor %}
+	</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+				<div id="mytable"></div>
+{% endblock %}
+{% block footer %}
+		<script type="text/javascript">
+			allArray = new Array(35)
+			{% for index, nList in allDict.items %}	
+			allArray[{{ index }}] = new Array({% for name in nList %}"{{ name }}",{% endfor %}"")
+			{% endfor %}
+
+			function getNames(myArr){
+				result = ""
+				for (i in myArr){
+					if (myArr[i] != ""){
+						result = result + myArr[i] + "<br/>"
+					}
+				}
+				return result
+			}
+
+			function drawTable(){
+				var vTable = document.createElement("table")
+				vTable.border = "1"
+				vTable.cellPadding = "7"
+				var vHead = vTable.insertRow(0)
+				var week = new Array("星期一","星期二","星期三","星期四","星期五","星期六","星期日")
+				var type = new Array("上午", "中午", "下午", "前台晚班", "小黑屋")
+				for(i = 0; i < 8; i++)
+				{
+					var vHd = vHead.insertCell(i)
+					if(i != 0)
+						vHd.innerHTML = week[i-1]
+				}
+				for(kindex = 1; kindex < 6; kindex++)
+				{
+					var vTr = vTable.insertRow(kindex)
+					for(iindex = 0; iindex < 8; iindex++)
+					{
+						if(iindex == 0){
+							var vTd = vTr.insertCell(0)
+							vTd.innerHTML = type[kindex-1]
+						} else {
+							var vTd = vTr.insertCell(iindex)
+								vTd.innerHTML = getNames(allArray[(kindex-1)*7+iindex -1]) + "<a href='/wm/editplan/" + iindex + "/" + kindex + "/'><h5>修改</h5></a>"
+						}
+					}
+				}
+
+				var mytable = document.getElementById('mytable')
+				mytable.appendChild(vTable)
+			}
+			
+			drawTable()
+		</script>
+{% endblock %}
