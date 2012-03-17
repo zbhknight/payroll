@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>最新签到</h2>
+<h3>最新签到</h3>
 {% if error %}
 {{ error }}
 {% else %}
@@ -9,11 +9,10 @@
 	<p><a href="/wm/detail/{{ item.id }}/">{{ item.checkDate }}{{ item.periodType }}签到............................................by{{ item.handler.name }}</a></p>
 	{% endfor %}
 </div>
-<div>
-	第{{ now }}页
-	{% for i in numList %}
-	<a href="/wm/viewcheck/{{ i }}/"> {{ i }} </a>
-	{% endfor %}
+<div id="page">
+	<a href="/wm/viewcheck/{% if now > 1 %}{{ now|add:"-1" }}{% else %}1{% endif %}/"><</a>
+	{% for i in numList %}<a href="/wm/viewcheck/{{ i }}/" {% if i == now %} class="current"{% endif %}>{{ i }}</a>{% endfor %}
+	<a href="/wm/viewcheck/{{ now|add:"1" }}/">></a>
 </div>
 {% endif %}
 {% endblock %}

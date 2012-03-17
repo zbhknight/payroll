@@ -3,37 +3,94 @@
 	<head>
 		<title>{% block title %}工资统计系统{% endblock %}</title>
 		<meta http-equiv="content-type" content="text/html";charset="utf-8">
-		<link href="/static/wm/main.css" type="text/css" rel="stylesheet">
-		<script type="text/javascript" src="/static/wm/jquery.js"></script>
+		<link href="/static/wm/css/reset.css" type="text/css" rel="stylesheet">
+		<link href="/static/wm/css/main.css" type="text/css" rel="stylesheet">
+		<link href="/static/wm/css/2col.css" type="text/css" rel="stylesheet">
+		<link href="/static/wm/css/style.css" type="text/css" rel="stylesheet">
+		<link href="/static/wm/css/mystyle.css" type="text/css" rel="stylesheet">
+		<!--[if IE 6]<link href="/static/wm/css/main-ie6.css" type="text/css" rel="stylesheet"><![endif]-->
+		<script type="text/javascript" src="/static/wm/js/jquery.js"></script>
+		<script type="text/javascript" src="/static/wm/js/switcher.js"></script>
+		<script type="text/javascript" src="/static/wm/js/toggle.js"></script>
+		<script type="text/javascript" src="/static/wm/js/ui.core.js"></script>
+		<script type="text/javascript" src="/static/wm/js/ui.tabs.js"></script>
+		<script type="text/javascript" src="/static/wm/js/myjs.js"></script>
 		{% block morehead %}{% endblock %}
 	</head>
-
 	<body>
-		<div id="container">
-			<div id="header">{% block header %}{% endblock %}</div>
-			<div id="wrapper">
-				<div id="content">
+		<div id="main">
+
+			<div id="tray" class="box">
+				<p class="f-left box">
+				<span class="f-left" id="switcher">东校区网络中心工资统计系统</span></p>
+				<p class="f-right">用户：<strong><a href="#">{{ user.stuNum }}</a></strong><strong><a href="/wm/logout/" id="logout">安全退出</a></strong></p>
+			</div>
+			<!--tray--!>
+
+			<hr class="noscreen" />
+
+			<div id="cols" class="box">
+				<div id="aside" class="box">	
+					<div class="padding box">
+						<p id="logo"><a href="#"><img src="/static/wm/img/logo.jpg" alt="" /></a></p>
+					</div>
+					<ul class="box">
+						<li id="submenu-active"><a href="#">日常签到</a>
+							<ul>
+								<li><a href="/wm/addcheck/">签到</a></li>
+								<li><a href="/wm/plan/">班表</a></li>
+								<li><a href="/wm/viewcheck/">查看签到</a></li>
+								<li><a href="/wm/checkstat/">签到统计</a></li>
+							</ul>
+						</li>
+						<li><a href="#">加班相关</a>
+							<ul>
+								<li><a href="/wm/ot/">加班</a></li>
+								{% if user.role == "black" %}
+								<li><a href="/wm/otshortcut/">特殊加班</a></li>
+								{% endif %}
+								<li><a href="/wm/viewot/">查看加班记录</a></li>
+							</ul>
+						</li>
+						<li><a href="#">工资相关</a>
+							<ul>
+								{% if user.role == "black" %}
+								<li><a href="/wm/getsalary/1/">统计工资</a></li>
+								{% endif %}
+								<li><a href="/wm/allsalary/">查看工资统计</a></li>
+							</ul>
+						</li>
+						{% if user.role == "black" %}
+						<li><a href="#">维护管理</a>
+							<ul>
+								<li><a href="/wm/sethour/">设置上班时间长度</a></li>
+								<li><a href="/wm/viewuser/">用户管理</a></li>
+							</ul>
+						</li>
+						{% endif %}
+					</ul>
+				</div>
+				<!--aside--!>
+
+				<hr class="noscreen" />
+
+				<div id="content" class="box">
 					{% block content %}{% endblock %}
 				</div>
+
+
+				<div id="footer" class="box">
+					<p class="f-left">CopyRight@2012</p>
+					<p class="f-right">zbhknight</p>
+					{% block footer %}{% endblock %}
+				</div>
+
 			</div>
-			<div id="navigator">
-				{% block navigator %}
-				<ul>
-					<li><a href="/wm/addcheck/">签到</a></li>
-					<li><a href="/wm/plan/">班表</a></li>
-					<li><a href="/wm/getsalary/1/">统计工资</a></li>
-					<li><a href="/wm/viewcheck/">查看签到</a></li>
-					<li><a href="/wm/allsalary/">查看工资统计</a></li>
-					<li><a href="/wm/ot/">加班</a></li>
-					<li><a href="/wm/logout/">退出</a></li>
-				</ul>
-				{% endblock %}
-			</div>
-			<div id="extra">
-				{% block extra %}{% endblock %}
-			</div>
-			<div id="footer">{% block footer %}{% endblock %}</div>
+			<!--cols--!>
+
 		</div>
+		<!--main--!>
+
 	</body>
 </html>
 

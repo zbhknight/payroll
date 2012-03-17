@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block morehead %}
 <script type="text/javascript">
-{% if new == "new" %}
-	alert("{{ back }}")
-	location.href="/wm/login/"
+{% if popOut == "yes" %}
+	alert("{{ eMsg }}")
+	location.href="{{ nextJump }}"
 {% endif %}
 </script>
 {% endblock %}

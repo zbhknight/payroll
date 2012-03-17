@@ -69,3 +69,8 @@ class Salary(models.Model):
 	absence = models.IntegerField()
 	total = models.FloatField()
 	erase = models.IntegerField()
+
+class pHour(models.Model):
+	ptype = models.IntegerField()
+	hour = models.FloatField()
+	option = models.CharField(max_length=200)

@@ -1,4 +1,106 @@
 {% extends "base.html" %}
+{% block morehead %}
+<script type="text/javascript" src="/static/wm/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/wm/js/django.js"></script>
+<script type="text/javascript">
+	function addTicket(){
+		i = $(".ticket").length
+		var formHtml = '<br/><div class="ticket"><label for="id_ticketNum-'+i+'">Ticket单号:</label><input id="id_ticketNum-'+i+'" type="text" name="ticketNum-'+i+'" maxlength="7" /><label for="id_reason-'+i+'">故障原因:</label><input id="id_reason-'+i+'" type="text" name="reason-'+i+'" maxlength="300" /><label for="id_way-'+i+'">处理方法:</label><input id="id_way-'+i+'" type="text" name="way-'+i+'" maxlength="300" /><input type="hidden" name="checkNum-'+i+'" id="id_checkNum-'+i+'" /><tr id="dealerRow-'+i+'"><label>处理人:</label><input id="dealer-0" type="text" name="dealername-'+i+'" maxlengtd="20" /></div>'
+		$("#ticketBlock").append(formHtml)
+	}
+
+	function changeback(target, reason, way, dealers){
+		target.find('.cReason').replaceWith('<label class="cReason">'+reason+'</label>')
+		target.find('.cWay').replaceWith('<label class="cWay">'+way+'</label>')
+		target.find('.cDealers').replaceWith('<label class="cDealers">'+dealers+'</label>')
+		target.find('.modifyOk').replaceWith('<input type="button" value="修改Ticket" class="modticket">')
+	}
+
+	function modify(input){
+		target = $(input).parent()
+		var tNumVal = target.find('.tNum').text()
+		var reasonVal = target.find('.cReason').val()
+		var wayVal = target.find('.cWay').val();
+		var dealersVal = target.find('.cDealers').val()
+
+		$.post("/wm/modticket/", {tNum:tNumVal, reason:reasonVal, way:wayVal, dealers:dealersVal}, function(json){
+				if(json['succeed'] == 'yes'){
+					alert("修改成功");
+					changeback(target, json['reason'], json['way'], json['dealers'])
+				}
+				else
+					alert(json['status'])
+			})
+	}
+
+	function modchange(input){
+		var inputHtml = '<input type="text" class="cReason">'
+		var target = $(input).parent();
+		var tmp = target.find('.cReason').text();
+		target.find('.cReason').replaceWith(inputHtml);
+		target.find('.cReason').val(tmp);
+
+		inputHtml = '<input type="text" class="cWay">'
+		tmp = target.find('.cWay').text();
+		target.find('.cWay').replaceWith(inputHtml);
+		target.find('.cWay').val(tmp);
+
+		inputHtml = '<input type="text" class="cDealers">'
+		tmp = target.find('.cDealers').text();
+		target.find('.cDealers').replaceWith(inputHtml);
+		target.find('.cDealers').val(tmp);
+
+		inputHtml = '<input type="button"  value="确认修改" class="modifyOk">'
+		target.find('.modticket').replaceWith(inputHtml);
+	}
+
+	function delticket(input){
+		var target = $(input).parent();
+		var tNumVal = target.find('.tNum').text();
+		var Msg = "确定删除?";
+		if(confirm(Msg) == true)
+			$.post("/wm/delticket/", {tNum:tNumVal}, function(json){
+					if(json['succeed'] == 'yes'){
+						alert("删除成功");
+						location.href="."
+					}
+					else
+						alert(json['status'])
+					})
+	}
+
+	function submitTicket(){
+		$('#id_ticketNum').val($('.ticket').length);
+		var allData = $('#id_ticketForm').serialize();
+		$.post("/wm/addticket/", allData, function(json){
+				if(json['succeed'] == "yes"){
+					alert("成功提交");
+					location.href = "/wm/detail/"+json['checkId']+'/'
+				}
+				else
+					alert(json['status']);
+				})
+	}
+
+	function submitDel(input){
+		var Msg = "确定删除?";
+		var target = $(input).parent().parent().find('.delForm');
+		if(confirm(Msg) == true)
+			target.submit();
+	}
+
+	function addClickHandlers(){
+		$('.modticket').live('click', function() {modchange(this)});
+		$('.modifyOk').live('click', function() {modify(this)});
+		$('.delticket').live('click', function() {delticket(this)});
+		$("#addTicket").click( function() {addTicket()});
+		$("#id_submitTicket").click(function() {submitTicket()});
+		$(".delBtn").click(function() {submitDel(this)});
+	}
+
+	$(document).ready(addClickHandlers);
+</script>
+{% endblock %}
 {% block content %}
 <div>
 	<h2>{{ check.checkDate }}{{ check.periodType}}签到</h2>
@@ -19,19 +121,33 @@
 <div>
 	{% for t in tList %}
 	<div>
-		Ticket {{t.ticketNum }}:<br/>
-		故障原因:{{ t.reason }}<br/>
-		处理方法:{{ t.way }}<br/>
-		处理人:
-		{% for dealer in t.namelist %}{{ dealer }} {% endfor %}
+		<p>Ticket:<label class="tNum">{{t.ticketNum }}</label></p>
+		<p>故障原因:<label class="cReason">{{ t.reason }}</label></p>
+		<p>处理方法:<label class="cWay">{{ t.way }}</label></p>
+		<p>处理人:<label class="cDealers">{% for dealer in t.namelist %}<label class="tochange">{{ dealer }}</label> {% endfor %}</label></p>
+		<input type="button" value="修改Ticket" class="modticket">
+		<input type="button" value="删除Ticket" class="delticket">
 	</div><br/>
 	{% endfor %}
 </div>
 {% if user.role == "black" %}
 <div>
-	<form method="POST" action="/wm/del/">{% csrf_token %}
+	<form method="POST" action="/wm/del/" class="delForm">{% csrf_token %}
 		<input type="hidden" id="id_cid" name="cid" value="{{ check.id }}">
-		<input type="submit" value="删除该签到">
+		<input type="button" class="delBtn" value="删除该签到">
+	</form>
+</div>
+<form method="post" action="" id="id_ticketForm">
+	<div id="ticketBlock">
+		<input type="button" value="添加ticket" id="addTicket"/>
+		<br/>
+		<input type="hidden" id="id_ticketNum" name="ticketNum" value=""/>
+		<input type="hidden" id="id_checkId" name="checkId" value="{{ check.id }}"/>
+	</div>
+</form>
+<div>
+	<hr>
+	<input type="button" value="提交ticket" id="id_submitTicket"/>
 </div>
 {% endif %}
 {% endblock %}

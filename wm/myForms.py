@@ -62,3 +62,23 @@ class salaryAllForm(forms.Form):
 	month = forms.IntegerField(label="月份")
 	startDate = forms.DateField(label="开始日期")
 	endDate = forms.DateField(label="结束日期")
+
+class fileForm(forms.Form):
+	file = forms.FileField()
+
+class setHourForm(forms.Form):
+	am = forms.FloatField(label="上午")
+	noon = forms.FloatField(label='中午')
+	pm = forms.FloatField(label='下午')
+	nightDesk = forms.FloatField(label='晚上前台')
+	darkHouse = forms.FloatField(label='小黑屋')
+	wam = forms.FloatField(label='周末上午')
+	wnoon = forms.FloatField(label='周末中午')
+	wpm = forms.FloatField(label='周末下午')
+
+class specialOtForm(forms.Form):
+	otChoice = ((0,"负责人"),(1,"内务组"))
+	year = forms.IntegerField(label="年份")
+	month = forms.IntegerField(label="月份")
+	hours = forms.FloatField(label="加班时长")
+	ottype = forms.ChoiceField(label="加班类型", choices=otChoice)

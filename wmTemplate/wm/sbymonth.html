@@ -1,4 +1,20 @@
 {% extends "base.html" %}
+{% block morehead %}
+<script type="text/javascript">
+	function submitDel(input){
+		var Msg = "确定删除?";
+		var target = $(input).parent().parent().find('.delForm');
+		if(confirm(Msg) == true)
+			target.submit();
+	}
+
+	function addClickHandlers(){
+		$(".delBtn").click(function() {submitDel(this)});
+	}
+
+	$(document).ready(addClickHandlers);
+</script>
+{% endblock %}
 {% block content %}
 	<table>
 		<thead align="center">
@@ -41,11 +57,13 @@
 		</tbody>
 	</table>
 	{% if role == 'black' %}
-	<form method="post" action="/wm/delsalary/">{% csrf_token %}
-		<input type="hidden" id="id_year" name="year" value="{{ year }}">
-		<input type="hidden" id="id_month" name="month" value="{{ month }}">
-		<input type="submit" value="删除">
-	</form>
+	<div>
+		<form method="post" class="delForm" action="/wm/delsalary/">{% csrf_token %}
+			<input type="hidden" id="id_year" name="year" value="{{ year }}">
+			<input type="hidden" id="id_month" name="month" value="{{ month }}">
+			<input type="button" class="delBtn" value="删除">
+		</form>
+	</div>
 	{% endif %}
 	<form method="post" action="/wm/download/">{% csrf_token %}
 		<input type="hidden" id="id_year" name="year" value="{{ year }}">
