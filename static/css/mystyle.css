@@ -1,0 +1,64 @@
+/* WRITE YOUR CSS CODE HERE */
+
+#page a{
+	display:block;
+	border:1px solid #cfcfcf;
+	background:#0085cc;
+	color:white;
+	width:30px;
+	height:18px;
+	float:left;
+	margin-left:10px;
+	margin-top:10px;
+	text-align:center;
+	text-decoration:none;
+	font-size:12px;
+}
+
+#page a.current:link,#page a.current:visited{
+	background:white;
+	color:#3366CC;
+}
+
+#page a.page_:link,#page a.page_:visited{
+	background:blue;
+	width:50px;
+}
+
+input[type="button"]{
+	font-size:11px;
+	font-weight:bold;
+	color:#888888;
+	width:100px;
+	height:25px;
+	background-color:#EEEEEE;
+	border-style:solid;
+	border-color:#BBBBBB;
+	border-width:1px;
+}
+input[type="submit"]{
+	font-size:11px;
+	font-weight:bold;
+	color:#888888;
+	width:100px;
+	height:25px;
+	background-color:#EEEEEE;
+	border-style:solid;
+	border-color:#BBBBBB;
+	border-width:1px;
+}
+
+#uCheckBlock, #ticketBlock{
+	padding:5px;
+	margin:5px;
+}
+
+#submitBtn {
+	text-align:center;
+	padding:5px;
+}
+
+#adducForm, #addTicket {
+	display:block;
+	float:right;
+}
