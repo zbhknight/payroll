@@ -33,6 +33,8 @@ urlpatterns = patterns('wm.views',
 	url(r'^checkstat/$', 'checkStat'),
 	url(r'^download/$', 'download'),
 	url(r'^otshortcut/$', 'otShortcut'),
+	url(r'^adduser/$', 'addUser'),
+	url(r'^deluser/$', 'delUser'),
 	url(r'^test', 'test'),
 	url(r'^.*$', 'viewCheck'),
 )

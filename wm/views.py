@@ -366,7 +366,7 @@ def a_getCheck(request):
 			json = simplejson.dumps(result)
 			return HttpResponse(json, mimetype='application/json')
 
-		option = request.session['user'].name + u"创建于" + str(time.ctime())
+		option = request.session['user'].name + u"创建于" + str(time.ctime())[4:]
 		checkList = Check.objects.filter(checkDate=cDate, periodType=ptype, erase=0)
 		if len(checkList) == 0:
 			newCheck = Check(checkDate=cDate,periodType=ptype,option=option, handler=request.session['user'], erase=0)
@@ -475,14 +475,16 @@ def viewCheck(request, page=1):
 		cList = Check.objects.filter(erase=0)
 		checkNum = len(cList)
 
-		if (page - 1)*10 < checkNum:
-			start = (page - 1)*10
-			pList = Check.objects.filter(erase=0).order_by('checkDate').reverse()[start:start+10]
+		eachPage = 15
+
+		if (page - 1)*eachPage < checkNum:
+			start = (page - 1)*eachPage
+			pList = Check.objects.filter(erase=0).order_by('checkDate').reverse()[start:start+eachPage]
 			for p in pList:
 				p.checkDate = str(p.checkDate)
 				p.periodType = types[p.periodType-1]
-			tmp = checkNum/10
-			if checkNum%10 != 0:
+			tmp = checkNum/eachPage
+			if checkNum%eachPage!= 0:
 				tmp = tmp + 1
 			numList = [ i+1 for i in range(tmp) ]
 			return render_to_response("wm/viewcheck.html", {'items':pList,'numList':numList, 'now':page, 'user':request.session['user']})
@@ -929,7 +931,7 @@ def viewUser(request, page='1'):
 			if userNum%20 != 0:
 				tmp = tmp + 1
 			numList = [ i+1 for i in range(tmp) ]
-			return render_to_response("wm/viewuser.html", {'items':pList,'numList':numList, 'now':page,'user':request.session['user']})
+			return render_to_response("wm/viewuser.html", {'items':pList,'numList':numList, 'now':page,'user':request.session['user']}, context_instance=RequestContext(request))
 		elif userNum == 0:
 			return render_to_response("wm/viewuser.html", {'error':u"无用户信息", 'user':request.session['user']})
 		else:
@@ -1124,6 +1126,10 @@ def a_modTicket(request):
 				tList.update(reason=data['reason'],way=data['way'])
 				oldList = UserTicket.objects.filter(FK_ticket=tList[0])
 				oldList.delete()
+				oldOpt = tList[0].FK_check.option
+				cList = Check.objects.filter(id=tList[0].FK_check.id)
+				newOpt = oldOpt + "." + request.session['user'].name + u'修改Ticket' + data['tNum'] + u'于' + str(time.ctime())[4:]
+				cList.update(option=newOpt)
 				for u in uList:
 					newUt = UserTicket(FK_user=u, FK_ticket=tList[0])
 					newUt.save()
@@ -1150,6 +1156,12 @@ def a_delTicket(request):
 		if len(tList) > 0:
 			oldList = UserTicket.objects.filter(FK_ticket=tList[0])
 			oldList.delete()
+
+			oldOpt = tList[0].FK_check.option
+			cList = Check.objects.filter(id=tList[0].FK_check.id)
+			newOpt = oldOpt + "." + request.session['user'].name + u'删除Ticket' + data['tNum'] + u'于' + str(time.ctime())[4:]
+			cList.update(option=newOpt)
+
 			tList.delete()
 			result['succeed'] = 'yes'
 		else:
@@ -1191,6 +1203,11 @@ def a_addTicket(request):
 		cList = Check.objects.filter(id=checkId)
 		if len(cList) > 0:
 			insertTicket(data, ticketNum, cList[0])
+
+			oldOpt = cList[0].option
+			newOpt = oldOpt + "." + request.session['user'].name + u'添加' + str(ticketNum) + u'张Ticket' + u'于' + str(time.ctime())[4:]
+			cList.update(option=newOpt)
+
 			result['succeed'] = 'yes'
 			result['checkId'] = data['checkId']
 		else:
@@ -1249,3 +1266,59 @@ def a_getRoleNameList(request):
 
 		json = simplejson.dumps(result)
 		return HttpResponse(json, mimetype='application/json')
+
+def addUser(request):
+	if checkLogin(request) and request.session['user'].role == "black":
+		if request.method == "POST":
+			uF = userForm(request.POST)
+			popOut = 'yes'
+			nextJump = '/wm/adduser/'
+			if uF.is_valid():
+				data = uF.cleaned_data
+				numList = data['numList'].split()
+				nameList = data['nameList'].split()
+				if len(numList) == len(nameList):
+					if len(set(numList)) == len(numList) and len(set(nameList)) == len(nameList):
+						nameDict = dict(zip(numList, nameList))
+						test1 = User.objects.filter(stuNum__in=nameDict.keys()).count()
+						test2 = User.objects.filter(name__in=nameDict.values()).count()
+						if test1 == 0 and test2 == 0:
+							for stuNum, name in nameDict.items():
+								newUser = User(stuNum=stuNum, name=name, password="1111111", salt="111111", erase=0)
+								newUser.save()
+							nextJump = '/wm/viewuser/'
+							eMsg = u'成功添加用户'
+						else:
+							eMsg = u'数据库中已存在相同的学号或名字'
+					else:
+						eMsg = u'名字或学号有重复'
+				else:
+					eMsg = u'学号和姓名个数不相同'
+			else:
+				eMsg = u'学号输入有误'
+
+			return render_to_response("wm/fallback.html", {'popOut':popOut, 'eMsg':eMsg, 'nextJump':nextJump})
+		else:
+			uF = userForm()
+			return render_to_response("wm/adduser.html", {'form':uF, 'user':request.session['user']}, context_instance=RequestContext(request))
+	else:
+		return HttpResponseRedirect("/wm/index/")
+
+def delUser(request):
+	if checkLogin(request) and request.session['user'].role == "black" and request.method == "POST":
+		data = request.POST
+		popOut = 'yes'
+		nextJump = '/wm/viewuser/'
+		try:
+			stuNum = data['stuNum'].strip()[:8]
+			pageNum = int(data['pageNum'])
+			oldUser = User.objects.filter(stuNum=stuNum)
+			oldUser.delete()
+			eMsg = u'成功删除用户'
+			nextJump = '/wm/viewuser/' + str(pageNum) + '/'
+		except:
+			eMsg = u'删除失败'
+
+		return render_to_response("wm/fallback.html", {'popOut':popOut, 'eMsg':eMsg, 'nextJump':nextJump})
+	else:
+		return HttpResponseRedirect("/wm/index/")

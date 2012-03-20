@@ -2,6 +2,7 @@
 {% block morehead %}
 <script type="text/javascript" src="/static/wm/js/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/static/wm/js/django.js"></script>
+{% if user.role %}
 <script type="text/javascript">
 	function addTicket(){
 		i = $(".ticket").length
@@ -100,6 +101,7 @@
 
 	$(document).ready(addClickHandlers);
 </script>
+{% endif %}
 {% endblock %}
 {% block content %}
 <div>
@@ -116,7 +118,11 @@
 	{{ a.FK_user.name }} (缺勤)<br/>
 	{% endfor %}
 </div>
-<br/>
+<div id="opt">
+	<p>
+	{{ check.option }}
+	</p>
+</div>
 <hr/>
 <div>
 	{% for t in tList %}
@@ -125,8 +131,10 @@
 		<p>故障原因:<label class="cReason">{{ t.reason }}</label></p>
 		<p>处理方法:<label class="cWay">{{ t.way }}</label></p>
 		<p>处理人:<label class="cDealers">{% for dealer in t.namelist %}<label class="tochange">{{ dealer }}</label> {% endfor %}</label></p>
+		{% if user.role %}
 		<input type="button" value="修改Ticket" class="modticket">
 		<input type="button" value="删除Ticket" class="delticket">
+		{% endif %}
 	</div><br/>
 	{% endfor %}
 </div>
@@ -137,6 +145,8 @@
 		<input type="button" class="delBtn" value="删除该签到">
 	</form>
 </div>
+{% endif %}
+{% if user.role %}
 <form method="post" action="" id="id_ticketForm">
 	<div id="ticketBlock">
 		<input type="button" value="添加ticket" id="addTicket"/>

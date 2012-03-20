@@ -42,7 +42,7 @@
 							vTd.innerHTML = type[kindex-1]
 						} else {
 							var vTd = vTr.insertCell(iindex)
-								vTd.innerHTML = getNames(allArray[(kindex-1)*7+iindex -1]) + "<a href='/wm/editplan/" + iindex + "/" + kindex + "/'><h5>修改</h5></a>"
+								vTd.innerHTML = getNames(allArray[(kindex-1)*7+iindex -1]) {% if user.role == "black" %} + "<a href='/wm/editplan/" + iindex + "/" + kindex + "/'><h5>修改</h5></a>"{% endif %}
 						}
 					}
 				}

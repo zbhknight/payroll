@@ -82,3 +82,7 @@ class specialOtForm(forms.Form):
 	month = forms.IntegerField(label="月份")
 	hours = forms.FloatField(label="加班时长")
 	ottype = forms.ChoiceField(label="加班类型", choices=otChoice)
+
+class userForm(forms.Form):
+	numList = forms.RegexField(label='新增学号列表', regex="^(\d{8}\s+)*(\d{8}\s*)$", max_length=300, widget=forms.Textarea)
+	nameList = forms.CharField(label='新增姓名列表', max_length=300, widget=forms.Textarea)

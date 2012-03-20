@@ -62,3 +62,13 @@ input[type="submit"]{
 	display:block;
 	float:right;
 }
+
+#opt {
+	display:block;
+	text-align:center;
+	color:blue;
+}
+
+textarea {
+	vertical-align:top;
+}

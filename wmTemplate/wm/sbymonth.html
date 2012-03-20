@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block morehead %}
 <script type="text/javascript">
+	{% if user.role == "black" %}
 	function submitDel(input){
 		var Msg = "确定删除?";
 		var target = $(input).parent().parent().find('.delForm');
 		if(confirm(Msg) == true)
 			target.submit();
 	}
+	{% endif %}
 
 	function addClickHandlers(){
 		$(".delBtn").click(function() {submitDel(this)});
